@@ -34,7 +34,8 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/bytemines/mycelium"
+    "url": "git+https://github.com/conradomateu/mycelium.git",
+    "directory": "packages/cli"
   },
   "devDependencies": {
     "@types/express": "^5.0.6",

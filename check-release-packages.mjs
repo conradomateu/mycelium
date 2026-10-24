@@ -13,6 +13,11 @@ for (const [name, archive] of [["core", coreArchive], ["cli", cliArchive]]) {
   const packed = JSON.parse(execFileSync("tar", ["-xOf", archive, "package/package.json"], { encoding: "utf8" }));
   assert.equal(packed.name, source.name);
   assert.equal(packed.version, source.version);
+  assert.deepEqual(packed.repository, {
+    type: "git",
+    url: "git+https://github.com/conradomateu/mycelium.git",
+    directory: `packages/${name}`,
+  }, `${name}: repository metadata must match the publishing repository for npm provenance`);
   assert.ok(files.includes("package/README.md"), `${name}: README missing`);
   assert.equal(packed.license, "MIT", `${name}: project license missing`);
   assert.ok(files.includes("package/dist/LICENSE"), `${name}: project license text missing`);

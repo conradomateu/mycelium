@@ -37,6 +37,11 @@
     "dist",
     "README.md"
   ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/conradomateu/mycelium.git",
+    "directory": "packages/core"
+  },
   "devDependencies": {
     "@types/node": "^25.9.9",
     "typescript": "^5.9.3",
