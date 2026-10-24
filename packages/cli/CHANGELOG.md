@@ -6,6 +6,14 @@
 
 - # 0.3.8
 
+  ## 🔒 Security and catch-up release
+  - Update locked runtime dependencies to `body-parser` 2.4.0 and `fast-uri`
+    3.1.9, fixing five dependency audit findings, including a high-severity
+    denial-of-service vulnerability.
+  - Includes the previously unpublished 0.3.6–0.3.7 fixes: OpenCode environment
+    placeholders, local dashboard protection, safer sync/removal and snapshot
+    restoration, preserved user settings and credentials, and clean release artifacts.
+
   ## 🩺 Self-healing MCP command paths
   - **`mycelium sync` re-detects machine overrides on every run.** Each MCP command
     is re-resolved via `which`, so a machine that installs a runtime binary (`uv`,

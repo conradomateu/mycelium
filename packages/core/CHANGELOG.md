@@ -6,6 +6,11 @@
 
 - # 0.3.8
 
+  ## 🔒 Security and catch-up release
+  - Includes the previously unpublished 0.3.7 fixes for safer configuration
+    handling and clean release artifacts. The matching CLI release also updates
+    locked runtime dependencies to fix five dependency audit findings.
+
   ## 🩺 Self-healing MCP command paths
   - **`mycelium sync` re-detects machine overrides on every run.** Each MCP command
     is re-resolved via `which`, so a machine that installs a runtime binary (`uv`,
