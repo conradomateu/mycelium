@@ -8,7 +8,7 @@ export function normalizeOpenCodeConfig(config: Record<string, unknown>): Record
   if (mcp.servers !== undefined && !isObject(mcp.servers)) {
     throw new Error("Invalid OpenCode mcp.servers: expected an object");
   }
-  const servers: Record<string, unknown> = {};
+  const servers: Record<string, unknown> = Object.create(null);
   for (const [name, entry] of Object.entries(mcp)) {
     if (name === "servers" || !isObject(entry)) continue;
     if (!["local", "remote"].includes(String(entry.type)) && !Array.isArray(entry.command)) continue;

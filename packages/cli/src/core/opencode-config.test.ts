@@ -51,4 +51,12 @@ describe("OpenCode V2 MCP configuration", () => {
       expect(() => normalizeOpenCodeConfig({ mcp })).toThrow("Invalid OpenCode");
     }
   });
+
+  it("preserves server names that coincide with Object.prototype properties", () => {
+    const config = JSON.parse('{"mcp":{"__proto__":{"type":"local","command":["keep"]},"servers":{"constructor":{"type":"remote","url":"https://example.com/mcp"}}}}');
+    const output = JSON.parse(JSON.stringify(normalizeOpenCodeConfig(config)));
+    expect(Object.hasOwn(output.mcp.servers, "__proto__")).toBe(true);
+    expect(output.mcp.servers.__proto__.command).toEqual(["keep"]);
+    expect(output.mcp.servers.constructor.url).toBe("https://example.com/mcp");
+  });
 });

@@ -1,5 +1,11 @@
 # @mycelish/cli
 
+## 0.3.10
+
+### Patch Changes
+
+- Preserve every OpenCode MCP server name during legacy configuration upgrades, including names that coincide with JavaScript object prototype properties.
+
 ## 0.3.9
 
 ### Patch Changes
