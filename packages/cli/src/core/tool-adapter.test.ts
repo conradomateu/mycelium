@@ -241,11 +241,11 @@ describe("tool-adapter", () => {
 
       expect(result.success).toBe(true);
       const written = JSON.parse(mockWriteFile.mock.calls[0][1]);
-      expect(written.mcp["test-mcp"]).toEqual({
+      expect(written.mcp.servers["test-mcp"]).toEqual({
         type: "local",
         command: ["npx", "-y", "some-server"],
         environment: { API_KEY: "test123" },
-        enabled: true,
+        disabled: false,
       });
     });
   });
@@ -254,7 +254,7 @@ describe("tool-adapter", () => {
   // OpenCode disableInFile
   // -----------------------------------------------------------------------
   describe("OpenCode disableInFile", () => {
-    it("sets enabled to false", async () => {
+    it("migrates legacy entries and sets disabled to true", async () => {
       mockReadFileIfExists.mockResolvedValueOnce(
         JSON.stringify({ mcp: { "test-mcp": { type: "local", command: ["npx"], enabled: true } } }),
       );
@@ -263,7 +263,31 @@ describe("tool-adapter", () => {
 
       expect(result.success).toBe(true);
       const written = JSON.parse(mockWriteFile.mock.calls[0][1]);
-      expect(written.mcp["test-mcp"].enabled).toBe(false);
+      expect(written.mcp.servers["test-mcp"].disabled).toBe(true);
+      expect(written.mcp["test-mcp"]).toBeUndefined();
+    });
+
+    it("enables a V2 entry without changing other servers", async () => {
+      mockReadFileIfExists.mockResolvedValueOnce(JSON.stringify({ mcp: { servers: {
+        "test-mcp": { type: "local", command: ["npx"], disabled: true },
+        native: { type: "remote", url: "https://example.com/mcp" },
+      } } }));
+      expect((await getAdapter("opencode").enableInFile("test-mcp")).success).toBe(true);
+      const written = JSON.parse(mockWriteFile.mock.calls[0][1]);
+      expect(written.mcp.servers["test-mcp"].disabled).toBe(false);
+      expect(written.mcp.servers.native.url).toBe("https://example.com/mcp");
+    });
+
+    it("removes legacy managed registrations without touching native V2 servers", async () => {
+      mockReadFileIfExists.mockResolvedValueOnce(JSON.stringify({ mcp: {
+        "test-mcp": { type: "local", command: ["npx"] },
+        servers: { native: { type: "remote", url: "https://example.com/mcp" } },
+      } }));
+      expect((await getAdapter("opencode").removeFromFile("test-mcp")).success).toBe(true);
+      const written = JSON.parse(mockWriteFile.mock.calls[0][1]);
+      expect(written.mcp["test-mcp"]).toBeUndefined();
+      expect(written.mcp.servers["test-mcp"]).toBeUndefined();
+      expect(written.mcp.servers.native.url).toBe("https://example.com/mcp");
     });
   });
 

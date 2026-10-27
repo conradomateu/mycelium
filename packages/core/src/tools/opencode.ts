@@ -17,7 +17,7 @@ export const opencode: ToolDescriptor = {
     commands: "~/.config/opencode/commands/",
     backupDirs: ["~/.config/opencode"],
   },
-  mcp: { format: "json", key: "mcp", entryShape: "opencode" },
+  mcp: { format: "json", key: "mcp.servers", entryShape: "opencode" },
   capabilities: ["mcp", "skills", "agents", "hooks", "commands"],
   enabled: true,
 };

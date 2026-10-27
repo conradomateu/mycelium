@@ -174,6 +174,20 @@ describe("scanOpenCode", () => {
     });
   });
 
+  it("scans V2 servers once, preferring them over legacy entries and ignoring timeout settings", async () => {
+    const { readFileIfExists } = await import("../fs-helpers.js");
+    vi.mocked(readFileIfExists).mockResolvedValue(JSON.stringify({ mcp: {
+      timeout: { startup: 30000 },
+      context7: { type: "local", command: ["old"] },
+      servers: { context7: { type: "local", command: ["npx", "context7"],
+        environment: { CONTEXT7_API_KEY: "{env:CONTEXT7_API_KEY}" } } },
+    } }));
+    const result = await scanOpenCode();
+    expect(result.mcps).toEqual([{ name: "context7", source: "opencode", config: {
+      command: "npx", args: ["context7"], env: { CONTEXT7_API_KEY: "{env:CONTEXT7_API_KEY}" },
+    } }]);
+  });
+
   it("scans commands as skills", async () => {
     const fs = await import("node:fs/promises");
     const commandsDir = path.join("/Users/conrado", ".config", "opencode", "commands");

@@ -12,6 +12,7 @@ import { readFileIfExists, mkdirp } from "./fs-helpers.js";
 import { getAdapter } from "./tool-adapter.js";
 import { encodeMcpToml, tomlString } from "./toml-encoding.js";
 import { replaceMcpSection } from "./toml-helpers.js";
+import { GenericAdapter } from "./auto-adapter.js";
 
 // ============================================================================
 // Types
@@ -245,6 +246,8 @@ export async function dryRunSync(
     }
     config.plugins = { ...plugins, entries };
     newContent = JSON.stringify(config, null, 2);
+  } else if (desc?.mcp.entryShape === "opencode") {
+    newContent = JSON.stringify(new GenericAdapter(desc).buildJsonConfig(currentContent, mcps), null, 2);
   } else {
     // JSON tools
     const config: Record<string, unknown> = currentContent ? JSON.parse(currentContent) : {};

@@ -16,6 +16,7 @@ import { parseSkillMd } from "../skill-parser.js";
 import { detectInstalledTools } from "../tool-detector.js";
 import { readFileIfExists, MYCELIUM_HOME } from "../fs-helpers.js";
 import { scanPluginCache } from "../plugin-scanner.js";
+import { normalizeOpenCodeConfig } from "../opencode-config.js";
 
 // ============================================================================
 // Helpers
@@ -452,11 +453,10 @@ export async function scanOpenCode(): Promise<ToolScanResult> {
     if (raw) {
       // Strip // comments for JSONC compat
       raw = raw.replace(/^\s*\/\/.*$/gm, "");
-      const config = JSON.parse(raw);
-
-      // MCPs from mcp.{name} entries
-      if (config.mcp && typeof config.mcp === "object") {
-        for (const [name, server] of Object.entries(config.mcp)) {
+      const config = normalizeOpenCodeConfig(JSON.parse(raw));
+      const servers = (config.mcp as { servers?: Record<string, unknown> } | undefined)?.servers;
+      if (servers) {
+        for (const [name, server] of Object.entries(servers)) {
           const srv = server as {
             type?: string;
             command?: string[];

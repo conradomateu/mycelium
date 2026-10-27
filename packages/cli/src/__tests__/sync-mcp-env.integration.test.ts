@@ -65,7 +65,7 @@ describe("syncTool MCP environment resolution → adapter export", () => {
 
     expect((await syncTool("opencode", config, vars)).status).toBe("synced");
     const written = JSON.parse(await fs.readFile(path.join(tempDir, "opencode.json"), "utf-8"));
-    expect(written.mcp.massive.environment).toEqual({
+    expect(written.mcp.servers.massive.environment).toEqual({
       MASSIVE_API_KEY: "{env:MASSIVE_API_KEY}",
       COMBINED: "Bearer {env:MASSIVE_API_KEY}/{env:ACCOUNT_2}/{env:MASSIVE_API_KEY}",
       RESOLVED: "local",
@@ -76,8 +76,8 @@ describe("syncTool MCP environment resolution → adapter export", () => {
       EMPTY: "",
       NATIVE: "{env:MASSIVE_API_KEY}",
     });
-    expect(written.mcp.massive.command).toEqual(["uvx", "--with", "mcp<2", "mcp_massive", ""]);
-    expect(written.mcp.excluded).toBeUndefined();
+    expect(written.mcp.servers.massive.command).toEqual(["uvx", "--with", "mcp<2", "mcp_massive", ""]);
+    expect(written.mcp.servers.excluded).toBeUndefined();
     expect(config).toEqual(original);
     expect(vars).toEqual({ SERVER_COMMAND: "uvx", LOCAL_VALUE: "local", EMPTY_VALUE: "" });
 
@@ -94,8 +94,8 @@ describe("syncTool MCP environment resolution → adapter export", () => {
     config.mcps.massive.command = "uvx";
     expect((await syncTool("opencode", config)).status).toBe("synced");
     const written = JSON.parse(await fs.readFile(path.join(tempDir, "opencode.json"), "utf-8"));
-    expect(written.mcp.massive.environment.MASSIVE_API_KEY).toBe("{env:MASSIVE_API_KEY}");
-    expect(written.mcp.massive.environment.RESOLVED).toBe("{env:LOCAL_VALUE}");
-    expect(written.mcp.massive.environment.DEFAULT).toBe("fallback");
+    expect(written.mcp.servers.massive.environment.MASSIVE_API_KEY).toBe("{env:MASSIVE_API_KEY}");
+    expect(written.mcp.servers.massive.environment.RESOLVED).toBe("{env:LOCAL_VALUE}");
+    expect(written.mcp.servers.massive.environment.DEFAULT).toBe("fallback");
   });
 });

@@ -17,6 +17,7 @@ import {
 } from "@mycelish/core";
 import { readFileIfExists } from "./fs-helpers.js";
 import { getItemState, type ItemStateInfo, type ItemType } from "./manifest-state.js";
+import { normalizeOpenCodeConfig } from "./opencode-config.js";
 
 // ============================================================================
 // Types
@@ -56,9 +57,10 @@ async function checkMcpInTool(name: string, toolId: ToolId): Promise<{ present: 
       return { present: parseMcpFromToml(content, name), configPath };
     }
 
-    const parsed = desc.mcp.format === "jsonc"
+    let parsed = desc.mcp.format === "jsonc"
       ? jsonc.parse(content) as Record<string, unknown>
       : JSON.parse(content) as Record<string, unknown>;
+    if (desc.mcp.entryShape === "opencode") parsed = normalizeOpenCodeConfig(parsed);
 
     // Navigate nested key (e.g., "mcpServers" or "settings.mcpServers")
     const mcpSection = getNestedKey(parsed, desc.mcp.key);

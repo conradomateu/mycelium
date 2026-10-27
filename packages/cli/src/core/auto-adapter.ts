@@ -11,6 +11,7 @@ import { type ToolDescriptor, resolvePath } from "@mycelish/core";
 import { readFileIfExists, mkdirp } from "./fs-helpers.js";
 import { replaceNamedMcpSection } from "./toml-helpers.js";
 import { encodeMcpToml } from "./toml-encoding.js";
+import { normalizeOpenCodeConfig } from "./opencode-config.js";
 import {
   type AdapterResult,
   BaseToolAdapter,
@@ -149,34 +150,7 @@ export class GenericAdapter extends BaseToolAdapter {
 
       // json or jsonc
       const existing = await this.readJsonConfig(configPath);
-      const config = existing === null ? {} : this.parseJsonConfig(existing);
-
-      // Read existing entries to preserve extra properties
-      const existingEntries = (this.getNestedKey(config, this.desc.mcp.key) ?? {}) as Record<string, Record<string, unknown>>;
-
-      const entries: Record<string, unknown> = { ...existingEntries };
-      for (const [name, mcp] of Object.entries(mcps)) {
-        if (mcp.state && mcp.state !== "enabled") {
-          delete entries[name];
-          continue;
-        }
-        if (!mcp.command) continue; // Skip entries without a valid command
-        const shaped = this.shapeEntry(mcp);
-        const prev = existingEntries[name];
-        if (prev) {
-          const merged = { ...prev, ...shaped };
-          // Special case: if existing entry had enabled:false, preserve it
-          // (shapeEntry for opencode always sets enabled:true, which would overwrite)
-          if (prev.enabled === false && shaped.enabled === true) {
-            merged.enabled = false;
-          }
-          entries[name] = merged;
-        } else {
-          entries[name] = shaped;
-        }
-      }
-
-      this.setNestedKey(config, this.desc.mcp.key, entries);
+      const config = this.buildJsonConfig(existing, mcps);
 
       await mkdirp(path.dirname(configPath));
       await fs.writeFile(configPath, JSON.stringify(config, null, 2), "utf-8");
@@ -190,6 +164,27 @@ export class GenericAdapter extends BaseToolAdapter {
       });
       return { success: false, method: "file", error: String(err) };
     }
+  }
+
+  /** Shared by file writes and previews so native entry shaping cannot diverge. */
+  buildJsonConfig(existing: string | null, mcps: Record<string, McpServerConfig>): Record<string, unknown> {
+    const config = existing === null ? {} : this.parseJsonConfig(existing);
+    const existingEntries = (this.getNestedKey(config, this.desc.mcp.key) ?? {}) as Record<string, Record<string, unknown>>;
+    const entries: Record<string, unknown> = { ...existingEntries };
+    for (const [name, mcp] of Object.entries(mcps)) {
+      if (mcp.state && mcp.state !== "enabled") {
+        delete entries[name];
+        continue;
+      }
+      if (!mcp.command) continue;
+      const shaped = this.shapeEntry(mcp);
+      const prev = existingEntries[name];
+      const merged = { ...prev, ...shaped };
+      if (prev?.disabled === true && this.desc.mcp.entryShape === "opencode") merged.disabled = true;
+      entries[name] = merged;
+    }
+    this.setNestedKey(config, this.desc.mcp.key, entries);
+    return config;
   }
 
   async removeFromFile(name: string): Promise<AdapterResult> {
@@ -237,11 +232,11 @@ export class GenericAdapter extends BaseToolAdapter {
     try {
       const existing = await readFileIfExists(configPath);
       if (!existing) return { success: false, method: "file", error: "Config not found" };
-      const config = JSON.parse(existing);
+      const config = this.parseJsonConfig(existing);
       const section = this.getNestedKey(config, this.desc.mcp.key);
 
       if (section?.[name]) {
-        section[name].enabled = false;
+        section[name].disabled = true;
         await fs.writeFile(configPath, JSON.stringify(config, null, 2), "utf-8");
         return { success: true, method: "file" };
       }
@@ -268,11 +263,11 @@ export class GenericAdapter extends BaseToolAdapter {
     try {
       const existing = await readFileIfExists(configPath);
       if (!existing) return { success: false, method: "file", error: "Config not found" };
-      const config = JSON.parse(existing);
+      const config = this.parseJsonConfig(existing);
       const section = this.getNestedKey(config, this.desc.mcp.key);
 
       if (section?.[name]) {
-        section[name].enabled = true;
+        section[name].disabled = false;
         await fs.writeFile(configPath, JSON.stringify(config, null, 2), "utf-8");
         return { success: true, method: "file" };
       }
@@ -307,7 +302,7 @@ export class GenericAdapter extends BaseToolAdapter {
         const e: Record<string, unknown> = {
           type: "local",
           command: [mcp.command, ...(mcp.args || [])],
-          enabled: true,
+          disabled: false,
         };
         if (hasEnv) {
           e.environment = Object.fromEntries(
@@ -391,12 +386,13 @@ export class GenericAdapter extends BaseToolAdapter {
 
   private parseJsonConfig(content: string): Record<string, unknown> {
     const errors: jsonc.ParseError[] = [];
-    const config = this.desc.mcp.format === "jsonc"
+    let config = this.desc.mcp.format === "jsonc"
       ? jsonc.parse(content, errors, { allowTrailingComma: true })
       : JSON.parse(content);
     if (errors.length || !config || typeof config !== "object" || Array.isArray(config)) {
       throw new Error("Invalid native MCP config: expected a JSON object");
     }
+    if (this.desc.mcp.entryShape === "opencode") config = normalizeOpenCodeConfig(config);
     const section = this.getNestedKey(config, this.desc.mcp.key);
     if (section !== undefined && (!section || typeof section !== "object" || Array.isArray(section))) {
       throw new Error("Invalid native MCP section: expected an object");

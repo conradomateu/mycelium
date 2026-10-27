@@ -79,7 +79,7 @@ describe("manifest state → native MCP reconciliation", () => {
     expect((await run()).success).toBe(true);
     expect((await run()).success).toBe(true);
     expect(JSON.parse(await fs.readFile(nativePath, "utf-8"))).toEqual({
-      theme: "dark", mcp: { personal: { type: "remote", url: "https://example.invalid" } },
+      theme: "dark", mcp: { servers: { personal: { type: "remote", url: "https://example.invalid" } } },
     });
   });
 
@@ -116,7 +116,7 @@ describe("manifest state → native MCP reconciliation", () => {
     await manifest("global", { skills: { shared: { state: "disabled" } }, mcps: { shared: { state: "enabled" } } });
     config.mcps.shared = { command: "server" };
     expect((await run()).success).toBe(true);
-    expect(JSON.parse(await fs.readFile(nativePath, "utf-8")).mcp.shared.command).toEqual(["server"]);
+    expect(JSON.parse(await fs.readFile(nativePath, "utf-8")).mcp.servers.shared.command).toEqual(["server"]);
   });
 
   it("honors project state priority over global tombstones", async () => {
@@ -124,10 +124,10 @@ describe("manifest state → native MCP reconciliation", () => {
     await manifest("project", { mcps: { shared: { state: "enabled" } } });
     config.mcps.shared = { command: "server", state: "disabled" };
     expect((await run()).success).toBe(true);
-    expect(JSON.parse(await fs.readFile(nativePath, "utf-8")).mcp.shared).toBeDefined();
+    expect(JSON.parse(await fs.readFile(nativePath, "utf-8")).mcp.servers.shared).toBeDefined();
     await manifest("project", { mcps: { shared: { state: "disabled" } } });
     expect((await run()).success).toBe(true);
-    expect(JSON.parse(await fs.readFile(nativePath, "utf-8")).mcp.shared).toBeUndefined();
+    expect(JSON.parse(await fs.readFile(nativePath, "utf-8")).mcp.servers.shared).toBeUndefined();
   });
 
   it("removes tool-excluded managed entries without mutating source config", async () => {
@@ -135,7 +135,9 @@ describe("manifest state → native MCP reconciliation", () => {
     const original = structuredClone(config);
     await fs.writeFile(nativePath, JSON.stringify({ mcp: { shared: { command: ["old"] } } }));
     expect((await run()).success).toBe(true);
-    expect(JSON.parse(await fs.readFile(nativePath, "utf-8")).mcp.shared).toBeUndefined();
+    const written = JSON.parse(await fs.readFile(nativePath, "utf-8"));
+    expect(written.mcp.shared).toBeUndefined();
+    expect(written.mcp.servers.shared).toBeUndefined();
     expect(config).toEqual(original);
   });
 
@@ -143,7 +145,9 @@ describe("manifest state → native MCP reconciliation", () => {
     await manifest("global", { mcps: { shared: { state: "enabled", excludeTools: ["opencode"] } } });
     await fs.writeFile(nativePath, JSON.stringify({ mcp: { shared: { command: ["old"] } } }));
     expect((await run()).success).toBe(true);
-    expect(JSON.parse(await fs.readFile(nativePath, "utf-8")).mcp.shared).toBeUndefined();
+    const written = JSON.parse(await fs.readFile(nativePath, "utf-8"));
+    expect(written.mcp.shared).toBeUndefined();
+    expect(written.mcp.servers.shared).toBeUndefined();
   });
 
   it("surfaces native removal failures", async () => {

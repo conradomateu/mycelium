@@ -66,6 +66,12 @@ set +a
 opencode
 ```
 
+Starting with Mycelium 0.3.9, OpenCode exports use the V2 `mcp.servers` section and
+`disabled` flag. The next sync upgrades legacy `mcp.<name>` registrations, repairs
+stale environment placeholders, and preserves native servers and timeout settings.
+V2 registrations take precedence when both formats contain the same server name.
+Preview with `mycelium sync --tool opencode --dry-run` before applying the upgrade.
+
 Only source a trusted `.env.local` containing shell-compatible assignments. An already
 running OpenCode service may need restarting from that environment to inherit changes.
 

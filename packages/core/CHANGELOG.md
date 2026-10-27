@@ -1,5 +1,13 @@
 # @mycelish/core
 
+## 0.3.9
+
+### Patch Changes
+
+- Write OpenCode V2 MCP registrations under `mcp.servers` and use `disabled` instead of the deprecated `enabled` flag. Upgrade legacy registrations on synchronization without losing native servers, timeout settings, or per-server options.
+
+  Repair stale `${VARIABLE}` environment references as `{env:VARIABLE}`, including references left behind when a server switches to inherited credentials. Keep previews consistent with actual writes, and recognize both legacy and V2 registrations when scanning or checking state.
+
 ## 0.3.8
 
 ### Patch Changes

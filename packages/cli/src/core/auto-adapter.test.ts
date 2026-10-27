@@ -158,7 +158,7 @@ describe("auto-adapter", () => {
         type: "local",
         command: ["npx", "-y", "some-server"],
         environment: { API_KEY: "test123" },
-        enabled: true,
+        disabled: false,
       });
     });
 
@@ -244,7 +244,7 @@ describe("auto-adapter", () => {
 
       expect(result.success).toBe(true);
       const written = JSON.parse(mockWriteFile.mock.calls[0][1]);
-      expect(written.mcp["my-mcp"].type).toBe("local");
+      expect(written.mcp.servers["my-mcp"].type).toBe("local");
     });
 
     it("writes TOML for codex", async () => {
@@ -270,8 +270,8 @@ describe("auto-adapter", () => {
 
       expect(result.success).toBe(true);
       const written = JSON.parse(mockWriteFile.mock.calls[0][1]);
-      expect(written.mcp.massive.environment).toEqual({ MASSIVE_API_KEY: "{env:MASSIVE_API_KEY}" });
-      expect(written.mcp.massive.command).toEqual(["uvx", "--with", "mcp<2", "mcp_massive"]);
+      expect(written.mcp.servers.massive.environment).toEqual({ MASSIVE_API_KEY: "{env:MASSIVE_API_KEY}" });
+      expect(written.mcp.servers.massive.command).toEqual(["uvx", "--with", "mcp<2", "mcp_massive"]);
     });
   });
 
@@ -324,7 +324,7 @@ describe("auto-adapter", () => {
       expect(written.mcpServers["brand-new"]).toEqual({ command: "npx", args: ["-y", "brand-new"] });
     });
 
-    it("preserves enabled:false for opencode entryShape (does not overwrite with enabled:true)", async () => {
+    it("migrates and preserves enabled:false as disabled:true for OpenCode", async () => {
       const desc = TOOL_REGISTRY["opencode"];
       const adapter = new GenericAdapter(desc);
       mockReadFileIfExists.mockResolvedValue(JSON.stringify({
@@ -335,7 +335,20 @@ describe("auto-adapter", () => {
       const mcps = { "my-server": { command: "npx", args: ["-y", "my-server"] } };
       await adapter.writeToFile(mcps);
       const written = JSON.parse(mockWriteFile.mock.calls[0][1]);
-      expect(written.mcp["my-server"].enabled).toBe(false);
+      expect(written.mcp.servers["my-server"].disabled).toBe(true);
+      expect(written.mcp["my-server"]).toBeUndefined();
+    });
+
+    it("repairs old environment references even when the managed entry now inherits its environment", async () => {
+      mockReadFileIfExists.mockResolvedValue(JSON.stringify({ mcp: {
+        context7: { type: "local", command: ["old"], environment: { CONTEXT7_API_KEY: "${CONTEXT7_API_KEY}" } },
+        servers: { native: { type: "remote", url: "https://example.com/mcp" } },
+      } }));
+      await new GenericAdapter(TOOL_REGISTRY.opencode).writeToFile({ context7: { command: "npx" } });
+      const written = JSON.parse(mockWriteFile.mock.calls[0][1]);
+      expect(written.mcp.servers.context7.environment).toEqual({ CONTEXT7_API_KEY: "{env:CONTEXT7_API_KEY}" });
+      expect(written.mcp.servers.native.url).toBe("https://example.com/mcp");
+      expect(written.mcp.context7).toBeUndefined();
     });
   });
 

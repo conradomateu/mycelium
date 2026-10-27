@@ -221,7 +221,7 @@ describe("sync-writer", () => {
       mockFs.readFile.mockResolvedValue(
         JSON.stringify({
           mcp: {
-            "whark-trading": { command: "old", disabled: true },
+            "whark-trading": { type: "local", command: ["old"], disabled: true },
           },
           otherSetting: true,
         }),
@@ -230,10 +230,24 @@ describe("sync-writer", () => {
       const result = await dryRunSync("opencode", sampleMcps);
       const parsed = JSON.parse(result.newContent);
       // Nested key should work
-      expect(parsed.mcp["whark-trading"].command).toBe("uvx");
-      expect(parsed.mcp["whark-trading"].disabled).toBe(true);
+      expect(parsed.mcp.servers["whark-trading"].command).toEqual(["uvx", "whark-mcp"]);
+      expect(parsed.mcp.servers["whark-trading"].disabled).toBe(true);
       // Other config preserved
       expect(parsed.otherSetting).toBe(true);
+    });
+
+    it("previews V2 environment substitution and preserves unmanaged servers", async () => {
+      mockFs.readFile.mockResolvedValue(JSON.stringify({ mcp: { servers: {
+        native: { type: "remote", url: "https://example.com/mcp" },
+      } } }));
+      const result = await dryRunSync("opencode", {
+        context7: { command: "npx", args: ["context7"], env: { CONTEXT7_API_KEY: "${CONTEXT7_API_KEY}" } },
+      });
+      const parsed = JSON.parse(result.newContent);
+      expect(parsed.mcp.servers.context7).toEqual({ type: "local", command: ["npx", "context7"], disabled: false,
+        environment: { CONTEXT7_API_KEY: "{env:CONTEXT7_API_KEY}" } });
+      expect(parsed.mcp.servers.native.url).toBe("https://example.com/mcp");
+      expect(mockFs.writeFile).not.toHaveBeenCalled();
     });
   });
 });
