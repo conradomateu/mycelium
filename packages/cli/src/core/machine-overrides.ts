@@ -28,7 +28,8 @@ function serializeOverrides(overrides: MachineOverridesFile): string {
   let yaml = `hostname: ${overrides.hostname}\n`;
   yaml += `detectedAt: ${overrides.detectedAt}\n`;
   yaml += `updatedAt: ${overrides.updatedAt}\n`;
-  yaml += `mcps:\n`;
+  // an empty `mcps:` reads back as null, and config-merger would then take the whole file for MCP servers
+  yaml += Object.keys(overrides.mcps).length ? `mcps:\n` : `mcps: {}\n`;
   for (const [name, entry] of Object.entries(overrides.mcps)) {
     yaml += `  ${name}:\n`;
     yaml += `    command: ${entry.command}\n`;

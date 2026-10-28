@@ -235,9 +235,10 @@ export async function loadMachineConfig(): Promise<Partial<MergedConfig>> {
   const yamlContent = await readFileIfExists(path.join(machinesDir, `${hostname}.yaml`));
   if (yamlContent) {
     const parsed = parseConfig<Record<string, unknown>>(yamlContent, `machines/${hostname}.yaml`) ?? {};
-    // If the YAML has a `mcps` key with an object value, treat it as nested format
-    const mcps = (parsed.mcps && typeof parsed.mcps === "object" && !Array.isArray(parsed.mcps))
-      ? parsed.mcps as Record<string, McpServerConfig>
+    // A `mcps` key means the nested format, even when it is empty (`mcps:` reads as null): the
+    // overrides file (machine-overrides.ts) puts hostname/detectedAt/updatedAt next to it, which are not servers
+    const mcps = "mcps" in parsed
+      ? (parsed.mcps && typeof parsed.mcps === "object" && !Array.isArray(parsed.mcps) ? parsed.mcps : {}) as Record<string, McpServerConfig>
       : parsed as Record<string, McpServerConfig>;
     return { mcps, skills: await loadSkillItems(path.join(hostDir, "skills")), ...fileItems };
   }

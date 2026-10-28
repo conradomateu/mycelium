@@ -104,6 +104,20 @@ describe("saveMachineOverrides + load round-trip", () => {
     expect(loaded.hostname).toBe("my-mac");
     expect(loaded.mcps["test-mcp"].command).toBe("/usr/local/bin/test-mcp");
   });
+
+  it("writes an empty mcps map as {} so YAML does not read it as null", async () => {
+    let savedContent = "";
+    mockedWriteFile.mockImplementation((_p: string, content: string) => {
+      savedContent = content;
+      return Promise.resolve();
+    });
+
+    await saveMachineOverrides({ hostname: "my-mac", detectedAt: "a", updatedAt: "b", mcps: {} });
+
+    expect(savedContent).toContain("mcps: {}\n");
+    mockedReadFile.mockResolvedValue(savedContent);
+    expect((await loadMachineOverrides()).mcps).toEqual({});
+  });
 });
 
 describe("detectMcpOverrides", () => {

@@ -439,6 +439,24 @@ describe("loadMachineConfig", () => {
     expect(result.mcps).toHaveProperty("machine-mcp");
   });
 
+  it("reads an overrides file with an empty mcps key as no servers", async () => {
+    const fs = await import("node:fs/promises");
+    const { loadMachineConfig } = await import("./config-merger.js");
+    const hostname = os.hostname();
+    // what machine-overrides.ts wrote when a rescan found nothing to override
+    const yamlContent = "hostname: my-mac\ndetectedAt: 2026-10-28T00:39:01Z\nupdatedAt: 2026-10-28T00:39:01Z\nmcps:\n";
+
+    vi.mocked(fs.access).mockImplementation(async (p) => {
+      if (String(p).endsWith(`${hostname}.yaml`)) return undefined;
+      throw new Error("ENOENT");
+    });
+    vi.mocked(fs.readFile).mockResolvedValue(yamlContent);
+
+    const result = await loadMachineConfig();
+
+    expect(result.mcps).toEqual({});
+  });
+
   it("returns empty config if machine config does not exist", async () => {
     const fs = await import("node:fs/promises");
     const { loadMachineConfig } = await import("./config-merger.js");
