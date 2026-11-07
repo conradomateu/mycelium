@@ -24,7 +24,8 @@
   "pnpm": {
     "onlyBuiltDependencies": ["esbuild"],
     "overrides": {
-      "mermaid@11>katex": "0.18.2"
+      "mermaid@11>katex": "0.18.2",
+      "qs": ">=6.16.1"
     },
     "patchedDependencies": {
       "braces@3.0.3": "patches/braces@3.0.3.patch",
