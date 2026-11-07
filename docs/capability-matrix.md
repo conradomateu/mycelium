@@ -14,6 +14,7 @@ This document maps every supported tool to its capabilities, sync mechanisms, an
 | Cursor | - | Config (json) | Symlink | Copy | Config | Symlink |
 | VS Code | Symlink | Config (jsonc) | Symlink | Symlink | - | - |
 | Antigravity | Symlink | Config (json) | Symlink | - | - | - |
+| Kimi Code | Symlink | Config (json) | Symlink | - | - | - |
 
 **Legend:**
 - **Symlink** — Mycelium creates symlinks from the central store into the tool's directory
@@ -103,25 +104,35 @@ This document maps every supported tool to its capabilities, sync mechanisms, an
 | MCPs | Config (json) | `~/.gemini/antigravity/mcp_config.json` (`mcpServers`) | - |
 | Agents | Symlink | - | `.agent/` |
 
+### Kimi Code
+
+| Item Type | Mechanism | Global Path | Project Path |
+|-----------|-----------|-------------|--------------|
+| Skills | Symlink | `~/.kimi-code/skills/` | `.kimi-code/skills/` |
+| MCPs | Config (json) | `~/.kimi-code/mcp.json` (`mcpServers`) | `.kimi-code/mcp.json` |
+| Agents | Symlink | `~/.kimi-code/agents/` | `.kimi-code/agents/` |
+
+**Note:** Kimi Code resolves its data directory as `$KIMI_CODE_HOME` first, falling back to `~/.kimi-code`. Mycelium targets the default `~/.kimi-code` location; if you set `KIMI_CODE_HOME`, point it back at the default or sync manually. The `kimi` CLI has no `mcp add` subcommand — MCP config is file-based only.
+
 ## MCP Entry Shapes
 
 Different tools expect MCP server entries in different JSON structures:
 
 | Shape | Tools | Description |
 |-------|-------|-------------|
-| `standard` | Claude Code, Codex, Gemini CLI, Cursor, Antigravity | `{ command, args, env }` |
+| `standard` | Claude Code, Codex, Gemini CLI, Cursor, Antigravity, Kimi Code | `{ command, args, env }` |
 | `openclaw` | OpenClaw | Array-based format under `plugins.entries` |
 | `opencode` | OpenCode | Nested under `mcp` key |
 | `vscode` | VS Code | Under `servers` key in JSONC format |
 
 ## Adding a New Tool
 
-To add tool #9 to Mycelium:
+To add tool #10 to Mycelium:
 
 1. Create a new `ToolDescriptor` file in `packages/core/src/tools/` (e.g., `new-tool.ts`)
 2. Add the import and registry entry in `packages/core/src/tools/_registry.ts`
-3. Add an SVG icon to the dashboard assets
+3. Add an SVG icon to the dashboard assets (and its `SVG_MAP` entry in `ToolIcons.tsx`)
 
-The auto-adapter (`packages/cli/src/core/auto-adapter.ts`) will handle sync automatically for tools using standard JSON/JSONC/TOML formats. Only create a custom adapter if the tool has a unique entry shape (like OpenClaw's array format).
+The auto-adapter (`packages/cli/src/core/auto-adapter.ts`) will handle sync automatically for tools using standard JSON/JSONC/TOML formats. Only create a custom adapter if the tool has a unique entry shape (like OpenClaw's array format). For the full tail (change-detector tests and every doc that enumerates tools, including this one), follow the "Adding a new tool" checklist in `AGENTS.md`.
 
 See `packages/core/src/tools/_types.ts` for the full `ToolDescriptor` interface.

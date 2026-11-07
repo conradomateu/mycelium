@@ -103,13 +103,13 @@ Each log entry has 16 dimensions: ts, traceId, level, cmd, scope, op, tool, item
 
 ## Tool Registry (packages/core/src/tools/)
 
-Single source of truth for all tool knowledge. 8 tools: Claude Code, Codex, Gemini CLI, OpenCode, OpenClaw, Cursor, VS Code, Antigravity.
+Single source of truth for all tool knowledge. 9 tools: Claude Code, Codex, Gemini CLI, OpenCode, OpenClaw, Cursor, VS Code, Antigravity, Kimi Code.
 
 - `_types.ts` — `ToolDescriptor`, `Capability`, `McpFormat`, `McpEntryShape`, `PathSpec`
 - `_registry.ts` — `TOOL_REGISTRY`, `ALL_TOOL_IDS`, `resolvePath()`, `toolsWithCapability()`
 - One file per tool (e.g., `claude-code.ts`) exporting a `ToolDescriptor`
 
-**Adding a new tool**: 1 descriptor file + 1 import in `_registry.ts` + 1 SVG icon.
+**Adding a new tool**: 1 descriptor file + 1 import in `_registry.ts` + 1 SVG icon (and its `SVG_MAP` entry in `ToolIcons.tsx`). Then the tail: bump the change-detector tests (`_registry.test.ts`, `tool-detector.test.ts`), and update the docs that enumerate tools — `README.md` (badge + table), `AGENTS.md`/`CLAUDE.md`, `docs/MCP-SERVER.md`, `docs/capability-matrix.md`, `docs/ARCHITECTURE.md`, root `package.json` description, `packages/cli/src/index.ts` header, and the `--tool` list in `packages/cli/skills/debug-mycelium.md`.
 
 The auto-adapter (`packages/cli/src/core/auto-adapter.ts`) generates adapters from descriptors. A custom adapter exists only for OpenClaw (array format).
 

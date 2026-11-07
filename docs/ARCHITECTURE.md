@@ -1,6 +1,6 @@
 # Mycelium Architecture
 
-> Universal AI Tool Orchestrator — syncs skills, MCPs, agents, rules, commands, and hooks across 8 AI coding tools.
+> Universal AI Tool Orchestrator — syncs skills, MCPs, agents, rules, commands, and hooks across 9 AI coding tools.
 
 ## Design Philosophy
 
@@ -70,6 +70,7 @@ packages/core/src/tools/
   _registry.ts    TOOL_REGISTRY + helper functions
   claude-code.ts  codex.ts  gemini-cli.ts  opencode.ts
   openclaw.ts     cursor.ts  vscode.ts  antigravity.ts
+  kimi.ts
 ```
 
 The **auto-adapter factory** (`packages/cli/src/core/auto-adapter.ts`) generates a `GenericAdapter` from any descriptor, handling JSON/JSONC/TOML formats and all MCP entry shapes automatically. Tools with non-standard formats (OpenClaw's array-based plugins) provide custom adapters.
@@ -77,9 +78,9 @@ The **auto-adapter factory** (`packages/cli/src/core/auto-adapter.ts`) generates
 **Adding a new tool requires:**
 1. One descriptor file in `packages/core/src/tools/` (~30 lines)
 2. One import in `_registry.ts`
-3. One SVG icon in `packages/dashboard/src/components/icons/svg/`
+3. One SVG icon in `packages/dashboard/src/components/icons/svg/` (plus its `SVG_MAP` entry in `ToolIcons.tsx`)
 
-Everything else — schema validation, adapters, dashboard, sync — is derived from the registry.
+Everything else at runtime — schema validation, adapters, dashboard, sync — is derived from the registry. The remaining tail (change-detector tests, enumerating docs) is enumerated in the "Adding a new tool" checklist in `AGENTS.md`.
 
 ## Migration Design
 

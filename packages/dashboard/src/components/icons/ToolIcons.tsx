@@ -11,6 +11,7 @@ import openclawSvg from "./svg/openclaw.svg?raw";
 import cursorSvg from "./svg/cursor.svg?raw";
 import vscodeSvg from "./svg/vscode.svg?raw";
 import antigravitySvg from "./svg/antigravity.svg?raw";
+import kimiSvg from "./svg/kimi.svg?raw";
 import githubSvg from "./svg/github.svg?raw";
 import mcpSvg from "./svg/mcp.svg?raw";
 import { TOOL_REGISTRY } from "@mycelish/core";
@@ -61,6 +62,10 @@ export function AntigravityIcon({ size = 16 }: IconProps) {
   return <SvgIcon svg={antigravitySvg} size={size} />;
 }
 
+export function KimiIcon({ size = 16 }: IconProps) {
+  return <SvgIcon svg={kimiSvg} size={size} />;
+}
+
 const SVG_MAP: Record<string, string> = {
   claude: claudeSvg,
   openai: openaiSvg,
@@ -70,6 +75,7 @@ const SVG_MAP: Record<string, string> = {
   cursor: cursorSvg,
   vscode: vscodeSvg,
   antigravity: antigravitySvg,
+  kimi: kimiSvg,
 };
 
 export const TOOL_ICONS: Record<string, React.ReactNode> = Object.fromEntries(

@@ -255,7 +255,7 @@ These are the filterable dimensions in `mycelium report`:
 | `--cmd` | CLI command | sync, enable, disable, add, remove, migrate, doctor, plugin-sync, mcp |
 | `--scope` | What type | mcp, skill, config, memory, hook, plugin, manifest |
 | `--op` | Operation | takeover, release, symlink-create, symlink-remove, health-check, inject, sync, disable, enable |
-| `--tool` | Which tool | claude-code, cursor, vscode, codex, gemini, opencode, openclaw, antigravity |
+| `--tool` | Which tool | claude-code, cursor, vscode, codex, gemini-cli, opencode, openclaw, antigravity, kimi |
 | `--item` | Item name | any MCP/skill/hook/plugin name |
 | `--level` | Severity | debug, info, warn, error |
 | `--state` | Manifest state | enabled, disabled, deleted |

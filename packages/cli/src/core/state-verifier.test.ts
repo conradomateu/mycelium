@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
+import { ALL_TOOL_IDS } from "@mycelish/core";
 import * as fs from "node:fs/promises";
 
 vi.mock("node:fs/promises", () => ({
@@ -75,7 +76,7 @@ describe("state-verifier", () => {
       expect(result.drifted[0]).toContain("Claude Code");
     });
 
-    it("checks all 8 tools when no tool filter specified", async () => {
+    it("checks every registry tool when no tool filter specified", async () => {
       vi.mocked(fs.readFile).mockImplementation(async (p) => {
         const path = String(p);
         if (path.includes("manifest.yaml")) {
@@ -88,7 +89,7 @@ describe("state-verifier", () => {
       const { verifyItemState } = await import("./state-verifier.js");
       const result = await verifyItemState("my-agent", { type: "agent" });
 
-      expect(result.toolPresence.length).toBe(8);
+      expect(result.toolPresence.length).toBe(ALL_TOOL_IDS.length);
       expect(result.toolPresence.every(tp => tp.presentInConfig === false)).toBe(true);
     });
 

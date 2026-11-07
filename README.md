@@ -7,7 +7,7 @@
 <p align="center">
   <a href="https://github.com/bytemines/mycelium/actions/workflows/ci.yml"><img src="https://github.com/bytemines/mycelium/actions/workflows/ci.yml/badge.svg" alt="CI" /></a>
   <a href="https://www.npmjs.com/package/@mycelish/cli"><img src="https://img.shields.io/npm/v/@mycelish/cli?color=cb3837&logo=npm" alt="npm" /></a>
-  <img src="https://img.shields.io/badge/tools-8%20supported-blueviolet" alt="8 Tools" />
+  <img src="https://img.shields.io/badge/tools-9%20supported-blueviolet" alt="9 Tools" />
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-green" alt="MIT License" /></a>
 </p>
 
@@ -45,7 +45,7 @@ integration for AI tools.
 
 | | |
 |---|---|
-| 🔄 **Universal Sync** | 6 item types × 8 tools. One command. Your manual settings are preserved. |
+| 🔄 **Universal Sync** | 6 item types × 9 tools. One command. Your manual settings are preserved. |
 | 🏗️ **3-Tier Config** | Project > Machine > Global. Different MCPs per project, different paths per machine. |
 | 🧩 **Plugin Takeover** | Disable individual skills, agents, or commands within a plugin — without disabling the entire plugin. |
 | 💻 **Multi-PC Sync** | Push/pull via Git. MCP paths auto-detected per hostname. Secrets gitignored, templates tracked. |
@@ -70,6 +70,7 @@ integration for AI tools.
 | Cursor | — | ✅ | ✅ | ✅ | ✅ | ✅ |
 | VS Code | ✅ | ✅ | ✅ | ✅ | — | — |
 | Antigravity | ✅ | ✅ | ✅ | — | — | — |
+| Kimi Code | ✅ | ✅ | ✅ | — | — | — |
 
 ---
 

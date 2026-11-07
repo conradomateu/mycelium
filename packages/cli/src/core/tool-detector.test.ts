@@ -117,8 +117,7 @@ describe("ToolDetector", () => {
 
       const tools = await detectInstalledTools();
 
-      expect(tools).toHaveLength(8);
-      expect(tools.map((t) => t.id)).toEqual([
+      const expectedIds = [
         "claude-code",
         "codex",
         "gemini-cli",
@@ -127,7 +126,10 @@ describe("ToolDetector", () => {
         "cursor",
         "vscode",
         "antigravity",
-      ]);
+        "kimi",
+      ];
+      expect(tools).toHaveLength(expectedIds.length);
+      expect(tools.map((t) => t.id)).toEqual(expectedIds);
     });
   });
 

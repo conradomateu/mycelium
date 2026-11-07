@@ -8,6 +8,7 @@ import { openclaw } from "./openclaw.js";
 import { cursor } from "./cursor.js";
 import { vscode } from "./vscode.js";
 import { antigravity } from "./antigravity.js";
+import { kimi } from "./kimi.js";
 
 export const TOOL_REGISTRY: Record<string, ToolDescriptor> = {
   [claudeCode.id]: claudeCode,
@@ -18,6 +19,7 @@ export const TOOL_REGISTRY: Record<string, ToolDescriptor> = {
   [cursor.id]: cursor,
   [vscode.id]: vscode,
   [antigravity.id]: antigravity,
+  [kimi.id]: kimi,
 };
 
 export const ALL_TOOL_IDS = Object.keys(TOOL_REGISTRY);

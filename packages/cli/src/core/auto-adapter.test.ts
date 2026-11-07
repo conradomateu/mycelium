@@ -368,7 +368,7 @@ describe("auto-adapter", () => {
 
   });
 
-  describe("getAdapter works for all 8 registry tools", () => {
+  describe("getAdapter works for all registry tools", () => {
     it("does not throw for any tool in the registry", () => {
       for (const id of ALL_TOOL_IDS) {
         expect(() => getAdapter(id)).not.toThrow();

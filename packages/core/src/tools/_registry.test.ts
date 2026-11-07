@@ -11,13 +11,13 @@ import {
 
 describe("Tool Registry", () => {
   it("has 9 tools registered", () => {
-    expect(ALL_TOOL_IDS).toHaveLength(8);
+    expect(ALL_TOOL_IDS).toHaveLength(9);
   });
 
   it("contains all expected tool ids", () => {
     const expected = [
       "claude-code", "codex", "gemini-cli", "opencode",
-      "openclaw", "cursor", "vscode", "antigravity",
+      "openclaw", "cursor", "vscode", "antigravity", "kimi",
     ];
     for (const id of expected) {
       expect(TOOL_REGISTRY[id]).toBeDefined();
@@ -65,8 +65,8 @@ describe("getDescriptor", () => {
 });
 
 describe("toolsWithCapability", () => {
-  it("returns all 8 for mcp", () => {
-    expect(toolsWithCapability("mcp")).toHaveLength(8);
+  it("returns all 9 for mcp", () => {
+    expect(toolsWithCapability("mcp")).toHaveLength(9);
   });
 
   it("returns tools with hooks capability", () => {

@@ -49,7 +49,8 @@ If you need to register manually, add this to your tool's MCP config:
 | Gemini CLI | `~/.gemini/settings.json` | JSON |
 | OpenCode | `~/.config/opencode/config.json` | JSON |
 | OpenClaw | `~/.openclaw/config.json` | JSON |
-| Antigravity | `~/.gemini/antigravity/mcp.json` | JSON |
+| Antigravity | `~/.gemini/antigravity/mcp_config.json` | JSON |
+| Kimi Code | `~/.kimi-code/mcp.json` | JSON |
 
 ## Available Tools
 
@@ -92,7 +93,7 @@ MCP resources provide read-only snapshots of Mycelium state:
 | Resource | URI | Description |
 |----------|-----|-------------|
 | Config | `mycelium://config` | Current merged configuration (MCPs and skills with state and source) |
-| Tools | `mycelium://tools` | Full tool registry -- all 8 supported tools with capabilities, paths, and formats |
+| Tools | `mycelium://tools` | Full tool registry -- all 9 supported tools with capabilities, paths, and formats |
 
 Access resources from any MCP client:
 
